@@ -335,16 +335,18 @@
     function clearCart() {
       cart = {};
       currentOrderId = null;
+      document.getElementById("customerSelect").value = "";
+      onCustomerChange();
       renderProductCards();
       renderCart();
     }
 
     function saveOrderLocal() {
       const custName = document.getElementById("customerSelect").value;
-      if (!custName) { alert("กรุณาเลือกลูกค้าก่อนบันทึกออเดอร์"); return; }
+      if (!custName) { alert("กรุณาเลือกลูกค้าก่อนบันทึกออเดอร์"); return false; }
       const keys = Object.keys(cart);
-      if (keys.length === 0) { alert("กรุณาเลือกอย่างน้อย 1 รายการสินค้า"); return; }
-      if (keys.length > 18) { alert("รายการสินค้าเกิน 18 รายการ ไม่สามารถบันทึกได้"); return; }
+      if (keys.length === 0) { alert("กรุณาเลือกอย่างน้อย 1 รายการสินค้า"); return false; }
+      if (keys.length > 18) { alert("รายการสินค้าเกิน 18 รายการ ไม่สามารถบันทึกได้"); return false; }
 
       const cust = CUSTOMERS.find(c => c.name === custName);
       const itemsList = keys.map(k => ({ name: k, qty: cart[k].qty, price: cart[k].price }));
@@ -373,8 +375,8 @@
       }
 
       localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
-      alert("บันทึกประวัติออเดอร์ในอุปกรณ์เรียบร้อยแล้ว");
       renderHistoryList();
+      return true;
     }
 
     async function syncOrderToGoogleSheets() {
@@ -384,7 +386,8 @@
         return;
       }
 
-      saveOrderLocal();
+      const saved = saveOrderLocal();
+      if (!saved) return;
 
       const targetOrder = ordersHistory.find(o => o.orderId === currentOrderId);
       if (!targetOrder) return;
@@ -405,6 +408,9 @@
           localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
           badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> ส่ง Google Sheets สำเร็จ`;
           alert("ส่งข้อมูลไปยัง Google Sheets เรียบร้อยแล้ว!");
+          
+          // ล้างรายการสินค้าที่เลือกและชื่อลูกค้าออกอัตโนมัติ
+          clearCart();
         } else {
           throw new Error(res.message);
         }
