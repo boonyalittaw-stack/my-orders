@@ -1,249 +1,571 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบคีย์ออเดอร์ - นครปฐม</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f4f6f9; font-family: 'Sarabun', sans-serif; }
-        .card { border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        .btn-add { background-color: #e9ecef; color: #495057; border: 1px dashed #adb5bd; }
-        .btn-add:hover { background-color: #dee2e6; }
-        .history-box { max-height: 250px; overflow-y: auto; background-color: #ffffff; border-radius: 10px; border: 1px solid #e0e0e0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ระบบรับออเดอร์สินค้ามือถือ - นครปฐม</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { -webkit-tap-highlight-color: transparent; }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  </style>
 </head>
-<body class="py-4">
-<div class="container" style="max-width: 680px;">
-    <div class="card p-4 mb-4">
-        <h3 class="text-center text-primary mb-4 fw-bold">🛒 ระบบคีย์ออเดอร์ลูกค้า</h3>
-        
-        <form id="orderForm">
-            <!-- 1. เลือกลูกค้า -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">เลือกลูกค้า / ชื่อชีต</label>
-                <select class="form-select form-select-lg" id="customerSheet" required>
-                    <option value="">-- กรุณาเลือกลูกค้า --</option>
-                    <option value="คุณปุ้ย+ม่วย" data-mouy="true">ร้านม่วย (ลงฝั่งขวา O11-P28)</option>
-                    <option value="คุณปุ้ย+ม่วย" data-mouy="false">คุณปุ้ย (ร้านผัก) (ลงฝั่งซ้าย B11-C28)</option>
-                    <option value="เจ้เสริม">เจ้เสริม</option>
-                    <option value="เจ้ใหญ่">เจ้ใหญ่</option>
-                    <option value="เจ้เล็ก">เจ้เล็ก</option>
-                    <option value="เจ้ตา">เจ้ตา</option>
-                    <option value="เจ้นิด">เจ้นิด</option>
-                    <option value="โกเป้า">โกเป้า</option>
-                    <option value="เจ้บ๊วย">เจ้บ๊วย</option>
-                    <option value="พี่หนึ่ง">พี่หนึ่ง</option>
-                    <option value="เจ้กานดา">เจ้กานดา</option>
-                    <option value="เจ้หมวย">เจ้หมวย</option>
-                    <option value="เจ้เซียม">เจ้เซียม</option>
-                    <option value="เจ้ยู้">เจ้ยู้</option>
-                    <option value="เจ้ลั้ง">เจ้ลั้ง</option>
-                    <option value="เจ้เหมียว">เจ้เหมียว</option>
-                    <option value="ฮ.บุ้น">ฮ.บุ้น</option>
-                    <option value="พี่ราญ">พี่ราญ</option>
-                    <option value="ร้านเมย์">ร้านเมย์</option>
-                    <option value="เต้ย">เต้ย</option>
-                    <option value="เฟิร์น">เฟิร์น</option>
-                    <option value="คุณเปิ้ล">คุณเปิ้ล</option>
-                    <option value="ฮ.เชิด">ฮ.เชิด</option>
-                    <option value="เจ้เหมียวทุ่ง">เจ้เหมียว (ทุ่งพระเมรุ)</option>
-                    <option value="เจ้แหม่ม">เจ้แหม่ม</option>
-                    <option value="เล็ก ทุ่งพระเมรุ">เจ้เล็ก (ทุ่งพระเมรุ)</option>
-                    <option value="คุณนิรันดร์">คุณนิรันดร์</option>
-                    <option value="อุ๊">เจ้อุ๊</option>
-                    <option value="เจ้เตียว">เจ้นิด (เจ้เตียว)</option>
-                    <option value="เจ้นี">เจ้นี</option>
-                    <option value="เจ้กบ">เจ้กบ</option>
-                </select>
-            </div>
+<body class="bg-gray-100 text-gray-800 font-sans pb-24">
 
-            <hr class="my-4">
+  <!-- Header -->
+  <header class="bg-blue-600 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
+    <div>
+      <h1 class="text-lg font-bold">รับออเดอร์สินค้า (นครปฐม)</h1>
+      <p id="syncStatusBadge" class="text-xs text-blue-200 flex items-center gap-1">
+        <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> พร้อมใช้งาน
+      </p>
+    </div>
+    <button onclick="openConfigModal()" class="p-2 hover:bg-blue-700 rounded-lg">
+      <i data-lucide="settings" class="w-5 h-5"></i>
+    </button>
+  </header>
 
-            <!-- 2. รายการสินค้า -->
-            <h5 class="fw-bold mb-3">รายการสั่งซื้อ</h5>
-            <div id="itemsList"></div>
+  <!-- Navigation Tabs -->
+  <nav class="bg-white border-b flex justify-around text-sm font-medium sticky top-[60px] z-40 shadow-sm">
+    <button id="tabNavKey" onclick="switchTab('key')" class="py-3 px-4 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1">
+      <i data-lucide="shopping-cart" class="w-4 h-4"></i> คีย์ออเดอร์
+    </button>
+    <button id="tabNavHistory" onclick="switchTab('history')" class="py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1">
+      <i data-lucide="history" class="w-4 h-4"></i> ประวัติ
+    </button>
+    <button id="tabNavPrice" onclick="switchTab('price')" class="py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1">
+      <i data-lucide="tag" class="w-4 h-4"></i> จัดการราคา
+    </button>
+  </nav>
 
-            <button type="button" class="btn btn-add w-100 my-3 fw-bold" onclick="addItemRow()">+ เพิ่มรายการสินค้า</button>
-
-            <!-- 3. ปุ่มส่งข้อมูล -->
-            <button type="submit" class="btn btn-primary btn-lg w-100 mt-2 fw-bold" id="submitBtn">
-                บันทึกออเดอร์ลง Google Sheets
-            </button>
-        </form>
+  <!-- TAB 1: คีย์ออเดอร์ -->
+  <main id="tabKey" class="p-4 space-y-4">
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+      <label class="block text-xs font-semibold text-gray-500 mb-1">เลือกชื่อลูกค้า</label>
+      <select id="customerSelect" onchange="onCustomerChange()" class="w-full p-3 bg-gray-50 border rounded-lg font-medium text-base text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none">
+        <option value="">-- เลือกลูกค้า --</option>
+      </select>
+      <div id="customerSideInfo" class="text-xs text-blue-600 mt-2 font-medium hidden"></div>
+      
+      <button onclick="loadPreviousTemplate()" class="mt-3 w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg flex items-center justify-center gap-1">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i> ใช้รายการล่าสุดของลูกค้ารายนี้เป็นแม่แบบ
+      </button>
     </div>
 
-    <!-- 4. ประวัติการคีย์สำเร็จ -->
-    <div class="card p-4">
-        <h5 class="fw-bold text-secondary mb-3">🕒 ประวัติกดส่งสำเร็จ</h5>
-        <div class="history-box p-3">
-            <ul id="historyList" class="list-group list-group-flush">
-                <li class="list-group-item text-muted text-center py-3" id="noHistory">ยังไม่มีประวัติการส่งออเดอร์ในรอบนี้</li>
-            </ul>
-        </div>
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+      <label class="block text-xs font-semibold text-gray-500 mb-1">ค้นหารายการสินค้า</label>
+      <div class="relative">
+        <input type="text" id="itemSearchInput" oninput="renderProductCards()" placeholder="พิมพ์ชื่อสินค้า..." class="w-full p-3 pl-10 bg-gray-50 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 outline-none">
+        <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3 top-3.5"></i>
+      </div>
     </div>
-</div>
 
-<script>
-    // ⚠️ นำ Web App URL ของคุณมาวางตรงนี้
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLdO8T4kEyhx5FAodG2YvMPMZnWYULihcpd9a2QGu4zI9A9Ro67WsqDxCAxnLCaELB/exec";
+    <div id="productListContainer" class="space-y-3"></div>
 
-    // แม่แบบสำหรับสร้างรายการสินค้า
-    const itemTemplateHTML = `
-        <div class="row g-2 mb-2 item-row">
-            <div class="col-7">
-                <select class="form-select product-name" required>
-                    <option value="">-- เลือกรายการสินค้า --</option>
-                    <option value="ล.สั้น">ล.สั้น (28฿)</option>
-                    <option value="ล.บัว">ล.บัว (29฿)</option>
-                    <option value="ผ.ท">ผ.ท (28฿)</option>
-                    <option value="ญ">ญ (21฿)</option>
-                    <option value="ห่อส้ม">ห่อส้ม (21฿)</option>
-                    <option value="ญ.ทิวสน">ญ.ทิวสน (21฿)</option>
-                    <option value="ญ.น้ำ">ญ.น้ำ (21฿)</option>
-                    <option value="หั่น 5">หั่น 5 (21฿)</option>
-                    <option value="ผ.ส้ม 5">ผ.ส้ม 5 (21฿)</option>
-                    <option value="กลม">กลม (39฿)</option>
-                    <option value="แบน">แบน (39฿)</option>
-                    <option value="หยก">หยก (40฿)</option>
-                    <option value="เกี๊ยว">เกี๊ยว (40฿)</option>
-                    <option value="วุ้น.ฟ้าใส">วุ้น.ฟ้าใส (23฿)</option>
-                    <option value="สด">สด (29.5฿)</option>
-                    <option value="สดบัว.">สดบัว. (29.5฿)</option>
-                    <option value="สด.ช">สด.ช (29฿)</option>
-                    <option value="สดแชมป์">สดแชมป์ (28.5฿)</option>
-                    <option value="วุ้น.ช">วุ้น.ช (23฿)</option>
-                    <option value="วุ้นแชมป์">วุ้นแชมป์ (22.5฿)</option>
-                    <option value="ก.ล">ก.ล (29฿)</option>
-                    <option value="กล.">กล. (28.8฿)</option>
-                    <option value="กญ.">กญ. (26฿)</option>
-                    <option value="ไทร">ไทร (32฿)</option>
-                    <option value="ซอสแดง">ซอสแดง (145฿)</option>
-                    <option value="ซ.แดง">ซ.แดง (140฿)</option>
-                    <option value="แก้ว">แก้ว (50฿)</option>
-                    <option value="ดองขวด">ดองขวด (85฿)</option>
-                    <option value="ขวด">ขวด (85฿)</option>
-                    <option value="เตี๋ยวแพ็ค">เตี๋ยวแพ็ค (67฿)</option>
-                    <option value="หมี่เจ">หมี่เจ (38฿)</option>
-                    <option value="พิเศษ">พิเศษ (46฿)</option>
-                </select>
-            </div>
-            <div class="col-3">
-                <input type="number" class="form-control qty-input" placeholder="จำนวน" min="1" required inputmode="numeric">
-            </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-outline-danger w-100" onclick="removeItemRow(this)">X</button>
-            </div>
-        </div>
-    `;
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mt-6">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-gray-800 flex items-center gap-1">
+          <i data-lucide="list-checks" class="w-5 h-5 text-blue-600"></i> รายการที่เลือก (<span id="cartCount">0</span>/18)
+        </h3>
+        <button onclick="clearCart()" class="text-xs text-red-500 hover:text-red-700 flex items-center gap-1">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ล้างรายการ
+        </button>
+      </div>
 
-    // เพิ่มแถวสินค้าเมื่อโหลดหน้าเว็บครั้งแรก
-    window.onload = function() {
-        addItemRow();
-    };
+      <div id="cartItemsList" class="divide-y divide-gray-100 mb-4">
+        <div class="text-center py-6 text-gray-400 text-sm">ยังไม่มีรายการสินค้า</div>
+      </div>
 
-    function addItemRow() {
-        const container = document.getElementById('itemsList');
-        const div = document.createElement('div');
-        div.innerHTML = itemTemplateHTML.trim();
-        container.appendChild(div.firstChild);
-    }
+      <div class="border-t pt-3 flex justify-between items-center text-lg font-bold text-gray-900">
+        <span>ยอดรวมทั้งหมด</span>
+        <span id="cartTotalAmount" class="text-blue-600">0.00 บาท</span>
+      </div>
+    </div>
+  </main>
 
-    function removeItemRow(btn) {
-        const rows = document.querySelectorAll('.item-row');
-        if (rows.length > 1) {
-            btn.closest('.item-row').remove();
-        } else {
-            alert('ต้องมีรายการสินค้าอย่างน้อย 1 รายการ');
-        }
-    }
+  <!-- TAB 2: ประวัติ -->
+  <main id="tabHistory" class="p-4 space-y-4 hidden">
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+      <input type="text" id="historySearchInput" oninput="renderHistoryList()" placeholder="ค้นหาตามชื่อลูกค้า หรือ Order ID..." class="w-full p-3 bg-gray-50 border rounded-lg text-sm">
+    </div>
+    <div id="historyListContainer" class="space-y-3"></div>
+  </main>
 
-    document.getElementById('orderForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+  <!-- TAB 3: จัดการราคา -->
+  <main id="tabPrice" class="p-4 space-y-4 hidden">
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+      <h3 class="font-bold text-gray-800 mb-2">แก้ไขราคากลางฐานข้อมูล</h3>
+      <p class="text-xs text-gray-500 mb-4">การแก้ราคานี้จะบันทึกถาวรไปยัง Google Sheets (ชีต ฐานข้อมูล)</p>
+      <div id="globalPriceListContainer" class="space-y-3"></div>
+    </div>
+  </main>
 
-        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("นำ_WEB_APP_URL")) {
-            alert("กรุณาใส่ Web App URL ในโค้ดก่อนใช้งาน");
-            return;
-        }
+  <!-- Bottom Action Bar -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 shadow-lg flex gap-2 z-40">
+    <button onclick="saveOrderLocal()" class="flex-1 py-3 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl flex justify-center items-center gap-1">
+      <i data-lucide="save" class="w-5 h-5"></i> บันทึกออเดอร์
+    </button>
+    <button onclick="syncOrderToGoogleSheets()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex justify-center items-center gap-1">
+      <i data-lucide="send" class="w-5 h-5"></i> ส่ง Google Sheets
+    </button>
+  </div>
 
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerText = "⏳ กำลังบันทึกข้อมูล...";
+  <!-- Modal ตั้งค่า -->
+  <div id="configModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-xl space-y-4">
+      <h3 class="text-lg font-bold text-gray-800">ตั้งค่าการเชื่อมต่อ Google Sheets</h3>
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 mb-1">Web App URL (Google Apps Script)</label>
+        <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-3 border rounded-lg text-sm">
+      </div>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeConfigModal()" class="px-4 py-2 text-gray-600 font-medium text-sm">ยกเลิก</button>
+        <button onclick="saveConfig()" class="px-4 py-2 bg-blue-600 text-white font-medium text-sm rounded-lg">บันทึก</button>
+      </div>
+    </div>
+  </div>
 
-        const customerSelect = document.getElementById('customerSheet');
-        const selectedOption = customerSelect.options[customerSelect.selectedIndex];
-        
-        const customerSheet = selectedOption.value;
-        const customerTextName = selectedOption.text;
-        const isMouyTarget = selectedOption.getAttribute('data-mouy') === 'true';
+  <script>
+    const CUSTOMERS = [
+      { name: "คุณปุ้ย (ร้านผัก)", sheet: "คุณปุ้ย+ม่วย", side: "LEFT" },
+      { name: "ม่วย", sheet: "คุณปุ้ย+ม่วย", side: "RIGHT" },
+      { name: "เจ้เสริม", sheet: "เจ้เสริม", side: "LEFT" },
+      { name: "เจ้ใหญ่", sheet: "เจ้ใหญ่", side: "LEFT" },
+      { name: "เจ้เล็ก", sheet: "เจ้เล็ก", side: "LEFT" },
+      { name: "เจ้ตา", sheet: "เจ้ตา", side: "LEFT" },
+      { name: "เจ้นิด", sheet: "เจ้นิด", side: "LEFT" },
+      { name: "โกเป้า", sheet: "โกเป้า", side: "LEFT" },
+      { name: "เจ้บ๊วย", sheet: "เจ้บ๊วย", side: "LEFT" },
+      { name: "พี่หนึ่ง", sheet: "พี่หนึ่ง", side: "LEFT" },
+      { name: "เจ้กานดา", sheet: "เจ้กานดา", side: "LEFT" },
+      { name: "เจ้หมวย", sheet: "เจ้หมวย", side: "LEFT" },
+      { name: "เจ้เซียม", sheet: "เจ้เซียม", side: "LEFT" },
+      { name: "เจ้ยู้", sheet: "เจ้ยู้", side: "LEFT" },
+      { name: "เจ้ลั้ง", sheet: "เจ้ลั้ง", side: "LEFT" },
+      { name: "เจ้เหมียว", sheet: "เจ้เหมียว", side: "LEFT" },
+      { name: "ฮ.บุ้น", sheet: "ฮ.บุ้น", side: "LEFT" },
+      { name: "พี่ราญ", sheet: "พี่ราญ", side: "LEFT" },
+      { name: "ร้านเมย์", sheet: "ร้านเมย์", side: "LEFT" },
+      { name: "เต้ย", sheet: "เต้ย", side: "LEFT" },
+      { name: "เฟิร์น", sheet: "เฟิร์น", side: "LEFT" },
+      { name: "คุณเปิ้ล", sheet: "คุณเปิ้ล", side: "LEFT" },
+      { name: "ฮ.เชิด", sheet: "ฮ.เชิด", side: "LEFT" },
+      { name: "เจ้เหมียวทุ่ง", sheet: "เจ้เหมียวทุ่ง", side: "LEFT" },
+      { name: "เจ้แหม่ม", sheet: "เจ้แหม่ม", side: "LEFT" },
+      { name: "เล็ก ทุ่งพระเมรุ", sheet: "เล็ก ทุ่งพระเมรุ", side: "LEFT" },
+      { name: "คุณนิรันดร์", sheet: "คุณนิรันดร์", side: "LEFT" },
+      { name: "อุ๊", sheet: "อุ๊", side: "LEFT" },
+      { name: "เจ้เตียว", sheet: "เจ้เตียว", side: "LEFT" },
+      { name: "เจ้นี", sheet: "เจ้นี", side: "LEFT" },
+      { name: "เจ้กบ", sheet: "เจ้กบ", side: "LEFT" }
+    ];
 
-        const items = [];
-        let summaryTextArr = [];
+    const DEFAULT_PRODUCTS = [
+      { name: "ล.สั้น", price: 28.0 }, { name: "ล.บัว", price: 29.0 },
+      { name: "ผ.ท", price: 28.0 }, { name: "ญ", price: 21.0 },
+      { name: "ห่อส้ม", price: 21.0 }, { name: "ญ.ทิวสน", price: 21.0 },
+      { name: "ญ.น้ำ", price: 21.0 }, { name: "ผ.ส้ม 5", price: 21.0 },
+      { name: "กลม", price: 39.0 }, { name: "หยก", price: 40.0 },
+      { name: "สด", price: 29.5 }, { name: "สด.ช", price: 29.0 },
+      { name: "สดแชมป์", price: 28.5 }, { name: "วุ้น.ช", price: 23.0 },
+      { name: "วุ้นแชมป์", price: 22.5 }, { name: "ก.ล", price: 29.0 },
+      { name: "กล.", price: 28.8 }, { name: "กญ.", price: 26.0 },
+      { name: "ซอสแดง", price: 145.0 }, { name: "ซ.แดง", price: 140.0 },
+      { name: "แก้ว", price: 50.0 }, { name: "ดองขวด", price: 85.0 },
+      { name: "ขวด", price: 85.0 }, { name: "หมี่เจ", price: 38.0 },
+      { name: "พิเศษ", price: 46.0 }
+    ];
 
-        document.querySelectorAll('.item-row').forEach(row => {
-            const productName = row.querySelector('.product-name').value;
-            const qty = row.querySelector('.qty-input').value;
-            if (productName && qty) {
-                items.push({ productName: productName, qty: qty });
-                summaryTextArr.push(`${productName} = ${qty}`);
-            }
-        });
+    let currentOrderId = null;
+    let products = [...DEFAULT_PRODUCTS];
+    let cart = {};
+    let ordersHistory = [];
+    let gasUrl = localStorage.getItem("GAS_WEB_APP_URL") || "";
 
-        const payload = {
-            customerSheet: customerSheet,
-            isMouyTarget: isMouyTarget,
-            items: items
-        };
-
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-        })
-        .then(() => {
-            alert('✅ บันทึกข้อมูลเรียบร้อยแล้ว!');
-            
-            // เพิ่มประวัติการส่งสำเร็จ
-            addHistoryLog(customerTextName, summaryTextArr.join(', '));
-            
-            // รีเซ็ตฟอร์มให้พร้อมสำหรับคีย์คนถัดไป
-            resetForm();
-        })
-        .catch(err => {
-            alert('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + err);
-        })
-        .finally(() => {
-            btn.disabled = false;
-            btn.innerText = "บันทึกออเดอร์ลง Google Sheets";
-        });
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      initCustomerDropdown();
+      loadStoredProducts();
+      loadStoredHistory();
+      renderProductCards();
+      renderCart();
+      renderGlobalPriceList();
+      document.getElementById("gasUrlInput").value = gasUrl;
     });
 
-    function resetForm() {
-        document.getElementById('customerSheet').selectedIndex = 0;
-        document.getElementById('itemsList').innerHTML = '';
-        addItemRow(); // สร้างช่องใส่สินค้าว่างเริ่มต้นใหม่อย่างถูกต้อง
+    function initCustomerDropdown() {
+      const select = document.getElementById("customerSelect");
+      CUSTOMERS.forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = c.name;
+        opt.textContent = `${c.name} (${c.sheet}${c.side === 'RIGHT' ? ' - ฝั่งขวา' : ''})`;
+        select.appendChild(opt);
+      });
     }
 
-    function addHistoryLog(customerName, itemsSummary) {
-        const noHistory = document.getElementById('noHistory');
-        if (noHistory) noHistory.remove();
+    function onCustomerChange() {
+      const name = document.getElementById("customerSelect").value;
+      const cust = CUSTOMERS.find(c => c.name === name);
+      const infoDiv = document.getElementById("customerSideInfo");
+      if (cust) {
+        infoDiv.textContent = `ชีตปลายทาง: ${cust.sheet} [${cust.side === 'RIGHT' ? 'ฝั่งขวา O11:P28' : 'ฝั่งซ้าย B11:C28'}]`;
+        infoDiv.classList.remove("hidden");
+      } else {
+        infoDiv.classList.add("hidden");
+      }
+    }
 
-        const historyList = document.getElementById('historyList');
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    function loadStoredProducts() {
+      const stored = localStorage.getItem("PRODUCTS_DB");
+      if (stored) products = JSON.parse(stored);
+    }
 
-        const li = document.createElement('li');
-        li.className = 'list-group-item px-0 py-2';
-        li.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <strong class="text-primary">${customerName}</strong>
-                <span class="badge bg-success">${timeString} น.</span>
-            </div>
-            <div class="small text-muted mt-1">📦 รายการ: ${itemsSummary}</div>
+    function loadStoredHistory() {
+      const stored = localStorage.getItem("ORDERS_HISTORY");
+      if (stored) ordersHistory = JSON.parse(stored);
+    }
+
+    function renderProductCards() {
+      const search = document.getElementById("itemSearchInput").value.trim().toLowerCase();
+      const container = document.getElementById("productListContainer");
+      container.innerHTML = "";
+
+      const filtered = products.filter(p => p.name.toLowerCase().includes(search));
+
+      filtered.forEach(p => {
+        const cartItem = cart[p.name] || { qty: 0, price: p.price };
+        const card = document.createElement("div");
+        card.className = "bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center";
+        
+        card.innerHTML = `
+          <div>
+            <div class="font-bold text-base text-gray-800">${p.name}</div>
+            <div class="text-xs text-gray-500 mt-0.5">ราคาตั้งต้น: <span class="font-semibold text-gray-700">${p.price}</span> บาท</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="updateQty('${p.name}', -10)" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 active:scale-95 rounded-lg font-bold text-lg flex items-center justify-center">-</button>
+            <input type="number" pattern="[0-9]*" inputmode="numeric" value="${cartItem.qty || ''}" placeholder="0" onchange="setQty('${p.name}', this.value)" class="w-16 p-2 text-center border rounded-lg font-bold text-base bg-gray-50">
+            <button onclick="updateQty('${p.name}', 10)" class="w-10 h-10 bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-95 rounded-lg font-bold text-lg flex items-center justify-center">+</button>
+          </div>
         `;
-        historyList.insertBefore(li, historyList.firstChild);
+        container.appendChild(card);
+      });
     }
-</script>
+
+    function updateQty(name, delta) {
+      if (!cart[name]) {
+        const prod = products.find(p => p.name === name);
+        cart[name] = { qty: 0, price: prod.price };
+      }
+      cart[name].qty = Math.max(0, (cart[name].qty || 0) + delta);
+      if (cart[name].qty === 0) delete cart[name];
+      renderProductCards();
+      renderCart();
+    }
+
+    function setQty(name, val) {
+      const q = parseInt(val) || 0;
+      if (q <= 0) {
+        delete cart[name];
+      } else {
+        if (!cart[name]) {
+          const prod = products.find(p => p.name === name);
+          cart[name] = { qty: q, price: prod.price };
+        } else {
+          cart[name].qty = q;
+        }
+      }
+      renderProductCards();
+      renderCart();
+    }
+
+    function updatePriceOrder(name, newPrice) {
+      if (cart[name]) {
+        cart[name].price = parseFloat(newPrice) || 0;
+        renderCart();
+      }
+    }
+
+    function renderCart() {
+      const container = document.getElementById("cartItemsList");
+      const keys = Object.keys(cart);
+      document.getElementById("cartCount").textContent = keys.length;
+
+      if (keys.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-gray-400 text-sm">ยังไม่มีรายการสินค้า</div>`;
+        document.getElementById("cartTotalAmount").textContent = "0.00 บาท";
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = "";
+
+      keys.forEach(name => {
+        const item = cart[name];
+        const lineTotal = item.qty * item.price;
+        total += lineTotal;
+
+        const row = document.createElement("div");
+        row.className = "py-3 flex flex-col gap-2";
+        row.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-gray-800">${name}</span>
+            <span class="font-bold text-blue-600">${lineTotal.toLocaleString()} บาท</span>
+          </div>
+          <div class="flex items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-1">
+              <span class="text-gray-500">จำนวน:</span>
+              <span class="font-semibold bg-gray-100 px-2 py-1 rounded">${item.qty}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-gray-500">ราคา/หน่วย:</span>
+              <input type="number" step="0.5" value="${item.price}" onchange="updatePriceOrder('${name}', this.value)" class="w-20 p-1 border rounded text-right font-medium text-gray-800 bg-yellow-50">
+            </div>
+            <button onclick="setQty('${name}', 0)" class="text-red-500 hover:text-red-700">ลบ</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById("cartTotalAmount").textContent = `${total.toLocaleString()} บาท`;
+    }
+
+    function clearCart() {
+      cart = {};
+      currentOrderId = null;
+      renderProductCards();
+      renderCart();
+    }
+
+    function saveOrderLocal() {
+      const custName = document.getElementById("customerSelect").value;
+      if (!custName) { alert("กรุณาเลือกลูกค้าก่อนบันทึกออเดอร์"); return; }
+      const keys = Object.keys(cart);
+      if (keys.length === 0) { alert("กรุณาเลือกอย่างน้อย 1 รายการสินค้า"); return; }
+      if (keys.length > 18) { alert("รายการสินค้าเกิน 18 รายการ ไม่สามารถบันทึกได้"); return; }
+
+      const cust = CUSTOMERS.find(c => c.name === custName);
+      const itemsList = keys.map(k => ({ name: k, qty: cart[k].qty, price: cart[k].price }));
+      const total = itemsList.reduce((sum, i) => sum + (i.qty * i.price), 0);
+
+      if (!currentOrderId) {
+        currentOrderId = "ORD-" + Date.now();
+      }
+
+      const orderObj = {
+        orderId: currentOrderId,
+        customerName: cust.name,
+        sheetName: cust.sheet,
+        side: cust.side,
+        items: itemsList,
+        totalAmount: total,
+        updatedAt: new Date().toISOString(),
+        syncStatus: "PENDING"
+      };
+
+      const existingIndex = ordersHistory.findIndex(o => o.orderId === currentOrderId);
+      if (existingIndex >= 0) {
+        ordersHistory[existingIndex] = orderObj;
+      } else {
+        ordersHistory.unshift(orderObj);
+      }
+
+      localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
+      alert("บันทึกประวัติออเดอร์ในอุปกรณ์เรียบร้อยแล้ว");
+      renderHistoryList();
+    }
+
+    async function syncOrderToGoogleSheets() {
+      if (!gasUrl) {
+        alert("กรุณาตั้งค่า Web App URL ของ Google Apps Script ก่อน (ปุ่มรูปฟันเฟือง)");
+        openConfigModal();
+        return;
+      }
+
+      saveOrderLocal();
+
+      const targetOrder = ordersHistory.find(o => o.orderId === currentOrderId);
+      if (!targetOrder) return;
+
+      const badge = document.getElementById("syncStatusBadge");
+      badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-yellow-400 inline-block animate-ping"></span> กำลังส่งข้อมูล...`;
+
+      try {
+        const resp = await fetch(gasUrl, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "saveOrder", order: targetOrder })
+        });
+        const res = await resp.json();
+
+        if (res.status === "success") {
+          targetOrder.syncStatus = "SUCCESS";
+          localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
+          badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> ส่ง Google Sheets สำเร็จ`;
+          alert("ส่งข้อมูลไปยัง Google Sheets เรียบร้อยแล้ว!");
+        } else {
+          throw new Error(res.message);
+        }
+      } catch (err) {
+        targetOrder.syncStatus = "FAILED";
+        localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span> ส่งไม่สำเร็จ`;
+        alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message);
+      }
+      renderHistoryList();
+    }
+
+    function loadPreviousTemplate() {
+      const custName = document.getElementById("customerSelect").value;
+      if (!custName) { alert("กรุณาเลือกลูกค้าก่อน"); return; }
+      
+      const prevOrder = ordersHistory.find(o => o.customerName === custName);
+      if (!prevOrder) { alert("ไม่พบประวัติออเดอร์เดิมของลูกค้ารายนี้"); return; }
+
+      cart = {};
+      prevOrder.items.forEach(i => {
+        cart[i.name] = { qty: i.qty, price: i.price };
+      });
+      currentOrderId = null;
+      renderProductCards();
+      renderCart();
+      alert(`ดึงรายการแม่แบบเดิมของ ${custName} เรียบร้อยแล้ว`);
+    }
+
+    function renderHistoryList() {
+      const search = document.getElementById("historySearchInput").value.trim().toLowerCase();
+      const container = document.getElementById("historyListContainer");
+      container.innerHTML = "";
+
+      const filtered = ordersHistory.filter(o => 
+        o.customerName.toLowerCase().includes(search) || o.orderId.toLowerCase().includes(search)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">ไม่พบประวัติออเดอร์</div>`;
+        return;
+      }
+
+      filtered.forEach(o => {
+        const card = document.createElement("div");
+        card.className = "bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-2";
+        const dateStr = new Date(o.updatedAt).toLocaleString("th-TH");
+        
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-bold text-gray-800">${o.customerName}</div>
+              <div class="text-xs text-gray-400">${o.orderId} • ${dateStr}</div>
+            </div>
+            <span class="px-2 py-1 text-xs font-bold rounded-full ${o.syncStatus === 'SUCCESS' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+              ${o.syncStatus === 'SUCCESS' ? 'ซิงก์แล้ว' : 'ค้างซิงก์'}
+            </span>
+          </div>
+          <div class="text-xs text-gray-600">${o.items.length} รายการ • ยอดรวม <span class="font-bold text-blue-600">${o.totalAmount.toLocaleString()} บาท</span></div>
+          <div class="flex justify-end gap-2 pt-2 border-t">
+            <button onclick="editHistoryOrder('${o.orderId}')" class="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium text-xs rounded-lg flex items-center gap-1">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> แก้ไขออเดอร์นี้
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function editHistoryOrder(orderId) {
+      const order = ordersHistory.find(o => o.orderId === orderId);
+      if (!order) return;
+
+      currentOrderId = order.orderId;
+      document.getElementById("customerSelect").value = order.customerName;
+      onCustomerChange();
+
+      cart = {};
+      order.items.forEach(i => {
+        cart[i.name] = { qty: i.qty, price: i.price };
+      });
+
+      switchTab('key');
+      renderProductCards();
+      renderCart();
+    }
+
+    function renderGlobalPriceList() {
+      const container = document.getElementById("globalPriceListContainer");
+      container.innerHTML = "";
+
+      products.forEach(p => {
+        const row = document.createElement("div");
+        row.className = "flex items-center justify-between p-3 bg-gray-50 rounded-lg border";
+        row.innerHTML = `
+          <span class="font-bold text-gray-800 text-sm">${p.name}</span>
+          <div class="flex items-center gap-2">
+            <input type="number" step="0.5" id="globalPrice_${p.name}" value="${p.price}" class="w-20 p-2 border rounded font-bold text-right text-sm">
+            <button onclick="saveGlobalPrice('${p.name}')" class="px-3 py-2 bg-blue-600 text-white font-medium text-xs rounded-lg hover:bg-blue-700">บันทึกถาวร</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    async function saveGlobalPrice(itemName) {
+      const input = document.getElementById(`globalPrice_${itemName}`);
+      const newPrice = parseFloat(input.value) || 0;
+
+      const prod = products.find(p => p.name === itemName);
+      if (prod) prod.price = newPrice;
+      localStorage.setItem("PRODUCTS_DB", JSON.stringify(products));
+
+      if (gasUrl) {
+        try {
+          await fetch(gasUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ action: "updateGlobalPrice", itemName: itemName, newPrice: newPrice })
+          });
+          alert(`อัปเดตราคากลางถาวรของ ${itemName} เป็น ${newPrice} บาท เรียบร้อยแล้ว`);
+        } catch (e) {
+          alert("บันทึกในเครื่องแล้ว แต่ซิงก์ Google Sheets ไม่สำเร็จ: " + e.message);
+        }
+      } else {
+        alert(`บันทึกราคากลางของ ${itemName} ในเครื่องเรียบร้อยแล้ว`);
+      }
+      renderProductCards();
+    }
+
+    function switchTab(tab) {
+      document.getElementById("tabKey").classList.add("hidden");
+      document.getElementById("tabHistory").classList.add("hidden");
+      document.getElementById("tabPrice").classList.add("hidden");
+
+      document.getElementById("tabNavKey").className = "py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1";
+      document.getElementById("tabNavHistory").className = "py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1";
+      document.getElementById("tabNavPrice").className = "py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1";
+
+      if (tab === 'key') {
+        document.getElementById("tabKey").classList.remove("hidden");
+        document.getElementById("tabNavKey").className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1";
+      } else if (tab === 'history') {
+        document.getElementById("tabHistory").classList.remove("hidden");
+        document.getElementById("tabNavHistory").className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1";
+        renderHistoryList();
+      } else if (tab === 'price') {
+        document.getElementById("tabPrice").classList.remove("hidden");
+        document.getElementById("tabNavPrice").className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1";
+      }
+    }
+
+    function openConfigModal() { document.getElementById("configModal").classList.remove("hidden"); }
+    function closeConfigModal() { document.getElementById("configModal").classList.add("hidden"); }
+    function saveConfig() {
+      gasUrl = document.getElementById("gasUrlInput").value.trim();
+      localStorage.setItem("GAS_WEB_APP_URL", gasUrl);
+      closeConfigModal();
+      alert("บันทึกการตั้งค่า URL เรียบร้อยแล้ว");
+    }
+  </script>
 </body>
 </html>
