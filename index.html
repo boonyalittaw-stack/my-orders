@@ -12,7 +12,7 @@
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans pb-24">
+<body class="bg-gray-100 text-gray-800 font-sans pb-28">
 
   <!-- Header -->
   <header class="bg-blue-600 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
@@ -28,32 +28,41 @@
   </header>
 
   <!-- Navigation Tabs -->
-  <nav class="bg-white border-b flex justify-around text-sm font-medium sticky top-[60px] z-40 shadow-sm">
-    <button id="tabNavKey" onclick="switchTab('key')" class="py-3 px-4 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1">
+  <nav class="bg-white border-b flex justify-around text-xs sm:text-sm font-medium sticky top-[60px] z-40 shadow-sm overflow-x-auto">
+    <button id="tabNavKey" onclick="switchTab('key')" class="py-3 px-3 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1 whitespace-nowrap">
       <i data-lucide="shopping-cart" class="w-4 h-4"></i> คีย์ออเดอร์
     </button>
-    <button id="tabNavHistory" onclick="switchTab('history')" class="py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1">
-      <i data-lucide="history" class="w-4 h-4"></i> ประวัติ
+    <button id="tabNavHistory" onclick="switchTab('history')" class="py-3 px-3 text-gray-500 border-b-2 border-transparent flex items-center gap-1 whitespace-nowrap">
+      <i data-lucide="history" class="w-4 h-4"></i> ประวัติ & สรุปยอด
     </button>
-    <button id="tabNavPrice" onclick="switchTab('price')" class="py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1">
-      <i data-lucide="tag" class="w-4 h-4"></i> จัดการราคา
+    <button id="tabNavPrice" onclick="switchTab('price')" class="py-3 px-3 text-gray-500 border-b-2 border-transparent flex items-center gap-1 whitespace-nowrap">
+      <i data-lucide="sliders" class="w-4 h-4"></i> จัดการรายการ/ราคา
     </button>
   </nav>
 
   <!-- TAB 1: คีย์ออเดอร์ -->
   <main id="tabKey" class="p-4 space-y-4">
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-      <label class="block text-xs font-semibold text-gray-500 mb-1">เลือกชื่อลูกค้า</label>
-      <select id="customerSelect" onchange="onCustomerChange()" class="w-full p-3 bg-gray-50 border rounded-lg font-medium text-base text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none">
-        <option value="">-- เลือกลูกค้า --</option>
-      </select>
-      <div id="customerSideInfo" class="text-xs text-blue-600 mt-2 font-medium hidden"></div>
-      
-      <button onclick="loadPreviousTemplate()" class="mt-3 w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg flex items-center justify-center gap-1">
+    <!-- เลือกวันที่และเลือกลูกค้า -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 mb-1">วันที่ระบุในออเดอร์</label>
+        <input type="date" id="orderDateInput" class="w-full p-2.5 bg-gray-50 border rounded-lg font-medium text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 mb-1">เลือกชื่อลูกค้า</label>
+        <select id="customerSelect" onchange="onCustomerChange()" class="w-full p-3 bg-gray-50 border rounded-lg font-medium text-base text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none">
+          <option value="">-- เลือกลูกค้า --</option>
+        </select>
+        <div id="customerSideInfo" class="text-xs text-blue-600 mt-1 font-medium hidden"></div>
+      </div>
+
+      <button onclick="loadPreviousTemplate()" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg flex items-center justify-center gap-1">
         <i data-lucide="copy" class="w-3.5 h-3.5"></i> ใช้รายการล่าสุดของลูกค้ารายนี้เป็นแม่แบบ
       </button>
     </div>
 
+    <!-- ค้นหารายการสินค้า -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
       <label class="block text-xs font-semibold text-gray-500 mb-1">ค้นหารายการสินค้า</label>
       <div class="relative">
@@ -62,8 +71,10 @@
       </div>
     </div>
 
+    <!-- สินค้า Cards -->
     <div id="productListContainer" class="space-y-3"></div>
 
+    <!-- ตารางสรุปออเดอร์ที่เลือก -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mt-6">
       <div class="flex justify-between items-center mb-3">
         <h3 class="font-bold text-gray-800 flex items-center gap-1">
@@ -85,20 +96,68 @@
     </div>
   </main>
 
-  <!-- TAB 2: ประวัติ -->
+  <!-- TAB 2: ประวัติ & สรุปยอด -->
   <main id="tabHistory" class="p-4 space-y-4 hidden">
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-      <input type="text" id="historySearchInput" oninput="renderHistoryList()" placeholder="ค้นหาตามชื่อลูกค้า หรือ Order ID..." class="w-full p-3 bg-gray-50 border rounded-lg text-sm">
+    <!-- กรองวันที่ -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
+      <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1">
+        <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i> เลือกช่วงเวลาที่ต้องการดูสรุป
+      </h3>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">ตั้งแต่วันที่</label>
+          <input type="date" id="filterStartDate" onchange="renderHistoryAndSummary()" class="w-full p-2 border rounded-lg text-xs">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">ถึงวันที่</label>
+          <input type="date" id="filterEndDate" onchange="renderHistoryAndSummary()" class="w-full p-2 border rounded-lg text-xs">
+        </div>
+      </div>
+      <input type="text" id="historySearchInput" oninput="renderHistoryAndSummary()" placeholder="ค้นหาตามชื่อลูกค้า หรือ Order ID..." class="w-full p-2.5 bg-gray-50 border rounded-lg text-xs">
     </div>
-    <div id="historyListContainer" class="space-y-3"></div>
+
+    <!-- การ์ดสรุปยอดเงินรวม -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-blue-600 text-white p-4 rounded-xl shadow-sm">
+        <div class="text-xs text-blue-100 font-medium">ยอดขายรวมสุทธิ</div>
+        <div id="summaryTotalRevenue" class="text-xl font-bold mt-1">0.00 ฿</div>
+      </div>
+      <div class="bg-indigo-600 text-white p-4 rounded-xl shadow-sm">
+        <div class="text-xs text-indigo-100 font-medium">จำนวนออเดอร์ทั้งหมด</div>
+        <div id="summaryOrderCount" class="text-xl font-bold mt-1">0 ออเดอร์</div>
+      </div>
+    </div>
+
+    <!-- สรุปจำนวนสินค้ารวม (ตามแมปกลุ่มสินค้า) -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+      <h4 class="font-bold text-gray-800 text-sm mb-2 flex items-center justify-between">
+        <span class="flex items-center gap-1"><i data-lucide="package-check" class="w-4 h-4 text-green-600"></i> สรุปจำนวนสินค้ารวมที่ต้องส่ง</span>
+        <span class="text-xs text-gray-400 font-normal">(รวมกลุ่มชื่อตัวย่อแล้ว)</span>
+      </h4>
+      <div id="summaryProductsMatrix" class="divide-y divide-gray-100 text-xs">
+        <!-- JS จะมาเติมข้อมูล -->
+      </div>
+    </div>
+
+    <!-- รายการออเดอร์ย่อย (ประวัติ) -->
+    <div class="space-y-2">
+      <h4 class="font-bold text-gray-800 text-sm">รายการประวัติออเดอร์</h4>
+      <div id="historyListContainer" class="space-y-3"></div>
+    </div>
   </main>
 
-  <!-- TAB 3: จัดการราคา -->
+  <!-- TAB 3: จัดการรายการสินค้า / ลำดับ / ราคา -->
   <main id="tabPrice" class="p-4 space-y-4 hidden">
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-      <h3 class="font-bold text-gray-800 mb-2">แก้ไขราคากลางฐานข้อมูล</h3>
-      <p class="text-xs text-gray-500 mb-4">การแก้ราคานี้จะบันทึกถาวรไปยัง Google Sheets (ชีต ฐานข้อมูล)</p>
-      <div id="globalPriceListContainer" class="space-y-3"></div>
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-gray-800">จัดการสินค้า หน้าคีย์ออเดอร์</h3>
+        <button onclick="addNewProductPrompt()" class="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg flex items-center gap-1">
+          <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มสินค้าใหม่
+        </button>
+      </div>
+      <p class="text-xs text-gray-500">สามารถเลื่อนลำดับ เปิด/ปิดการแสดงผลสินค้าหน้าคีย์ หรือแก้ไขราคากลางได้จากส่วนนี้</p>
+      
+      <div id="globalPriceListContainer" class="space-y-2"></div>
     </div>
   </main>
 
@@ -162,20 +221,42 @@
       { name: "เจ้กบ", sheet: "เจ้กบ", side: "LEFT" }
     ];
 
+    // แมปชื่อสินค้าที่ถือเป็นชนิดเดียวกัน
+    const ITEM_GROUP_ALIAS = {
+      "ล.บัว": "ล.สั้น",
+      "สดแชมป์": "สด.ช",
+      "วุ้นแชมป์": "วุ้น.ช",
+      "กล.": "ก.ล",
+      "ซ.แดง": "ซอสแดง",
+      "ขวด": "ดองขวด"
+    };
+
     const DEFAULT_PRODUCTS = [
-      { name: "ล.สั้น", price: 28.0 }, { name: "ล.บัว", price: 29.0 },
-      { name: "ผ.ท", price: 28.0 }, { name: "ญ", price: 21.0 },
-      { name: "ห่อส้ม", price: 21.0 }, { name: "ญ.ทิวสน", price: 21.0 },
-      { name: "ญ.น้ำ", price: 21.0 }, { name: "ผ.ส้ม 5", price: 21.0 },
-      { name: "กลม", price: 39.0 }, { name: "หยก", price: 40.0 },
-      { name: "สด", price: 29.5 }, { name: "สด.ช", price: 29.0 },
-      { name: "สดแชมป์", price: 28.5 }, { name: "วุ้น.ช", price: 23.0 },
-      { name: "วุ้นแชมป์", price: 22.5 }, { name: "ก.ล", price: 29.0 },
-      { name: "กล.", price: 28.8 }, { name: "กญ.", price: 26.0 },
-      { name: "ซอสแดง", price: 145.0 }, { name: "ซ.แดง", price: 140.0 },
-      { name: "แก้ว", price: 50.0 }, { name: "ดองขวด", price: 85.0 },
-      { name: "ขวด", price: 85.0 }, { name: "หมี่เจ", price: 38.0 },
-      { name: "พิเศษ", price: 46.0 }
+      { name: "ล.สั้น", price: 28.0, visible: true }, 
+      { name: "ล.บัว", price: 29.0, visible: true },
+      { name: "ผ.ท", price: 28.0, visible: true }, 
+      { name: "ญ", price: 21.0, visible: true },
+      { name: "ห่อส้ม", price: 21.0, visible: true }, 
+      { name: "ญ.ทิวสน", price: 21.0, visible: true },
+      { name: "ญ.น้ำ", price: 21.0, visible: true }, 
+      { name: "ผ.ส้ม 5", price: 21.0, visible: true },
+      { name: "กลม", price: 39.0, visible: true }, 
+      { name: "หยก", price: 40.0, visible: true },
+      { name: "สด", price: 29.5, visible: true }, 
+      { name: "สด.ช", price: 29.0, visible: true },
+      { name: "สดแชมป์", price: 28.5, visible: true }, 
+      { name: "วุ้น.ช", price: 23.0, visible: true },
+      { name: "วุ้นแชมป์", price: 22.5, visible: true }, 
+      { name: "ก.ล", price: 29.0, visible: true },
+      { name: "กล.", price: 28.8, visible: true }, 
+      { name: "กญ.", price: 26.0, visible: true },
+      { name: "ซอสแดง", price: 145.0, visible: true }, 
+      { name: "ซ.แดง", price: 140.0, visible: true },
+      { name: "แก้ว", price: 50.0, visible: true }, 
+      { name: "ดองขวด", price: 85.0, visible: true },
+      { name: "ขวด", price: 85.0, visible: true }, 
+      { name: "หมี่เจ", price: 38.0, visible: true },
+      { name: "พิเศษ", price: 46.0, visible: true }
     ];
 
     let currentOrderId = null;
@@ -185,6 +266,12 @@
     let gasUrl = localStorage.getItem("GAS_WEB_APP_URL") || "";
 
     window.addEventListener("DOMContentLoaded", () => {
+      // ตั้งค่าวันที่เริ่มต้นเป็นวันปัจจุบัน
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("orderDateInput").value = today;
+      document.getElementById("filterStartDate").value = today;
+      document.getElementById("filterEndDate").value = today;
+
       lucide.createIcons();
       initCustomerDropdown();
       loadStoredProducts();
@@ -192,6 +279,7 @@
       renderProductCards();
       renderCart();
       renderGlobalPriceList();
+      renderHistoryAndSummary();
       document.getElementById("gasUrlInput").value = gasUrl;
     });
 
@@ -218,8 +306,14 @@
     }
 
     function loadStoredProducts() {
-      const stored = localStorage.getItem("PRODUCTS_DB");
-      if (stored) products = JSON.parse(stored);
+      const stored = localStorage.getItem("PRODUCTS_DB_V2");
+      if (stored) {
+        products = JSON.parse(stored);
+      }
+    }
+
+    function saveStoredProducts() {
+      localStorage.setItem("PRODUCTS_DB_V2", JSON.stringify(products));
     }
 
     function loadStoredHistory() {
@@ -232,7 +326,9 @@
       const container = document.getElementById("productListContainer");
       container.innerHTML = "";
 
-      const filtered = products.filter(p => p.name.toLowerCase().includes(search));
+      // กรองเฉพาะรายการที่ visible = true (หรือไม่ได้ถูกซ่อนไว้)
+      const visibleProducts = products.filter(p => p.visible !== false);
+      const filtered = visibleProducts.filter(p => p.name.toLowerCase().includes(search));
 
       filtered.forEach(p => {
         const cartItem = cart[p.name] || { qty: 0, price: p.price };
@@ -257,7 +353,7 @@
     function updateQty(name, delta) {
       if (!cart[name]) {
         const prod = products.find(p => p.name === name);
-        cart[name] = { qty: 0, price: prod.price };
+        cart[name] = { qty: 0, price: prod ? prod.price : 0 };
       }
       cart[name].qty = Math.max(0, (cart[name].qty || 0) + delta);
       if (cart[name].qty === 0) delete cart[name];
@@ -272,7 +368,7 @@
       } else {
         if (!cart[name]) {
           const prod = products.find(p => p.name === name);
-          cart[name] = { qty: q, price: prod.price };
+          cart[name] = { qty: q, price: prod ? prod.price : 0 };
         } else {
           cart[name].qty = q;
         }
@@ -348,6 +444,7 @@
       if (keys.length === 0) { alert("กรุณาเลือกอย่างน้อย 1 รายการสินค้า"); return false; }
       if (keys.length > 18) { alert("รายการสินค้าเกิน 18 รายการ ไม่สามารถบันทึกได้"); return false; }
 
+      const selectedDate = document.getElementById("orderDateInput").value;
       const cust = CUSTOMERS.find(c => c.name === custName);
       const itemsList = keys.map(k => ({ name: k, qty: cart[k].qty, price: cart[k].price }));
       const total = itemsList.reduce((sum, i) => sum + (i.qty * i.price), 0);
@@ -363,6 +460,7 @@
         side: cust.side,
         items: itemsList,
         totalAmount: total,
+        orderDate: selectedDate || new Date().toISOString().split('T')[0],
         updatedAt: new Date().toISOString(),
         syncStatus: "PENDING"
       };
@@ -375,7 +473,7 @@
       }
 
       localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
-      renderHistoryList();
+      renderHistoryAndSummary();
       return true;
     }
 
@@ -408,8 +506,6 @@
           localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
           badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> ส่ง Google Sheets สำเร็จ`;
           alert("ส่งข้อมูลไปยัง Google Sheets เรียบร้อยแล้ว!");
-          
-          // ล้างรายการสินค้าที่เลือกและชื่อลูกค้าออกอัตโนมัติ
           clearCart();
         } else {
           throw new Error(res.message);
@@ -420,7 +516,7 @@
         badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span> ส่งไม่สำเร็จ`;
         alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err.message);
       }
-      renderHistoryList();
+      renderHistoryAndSummary();
     }
 
     function loadPreviousTemplate() {
@@ -440,45 +536,121 @@
       alert(`ดึงรายการแม่แบบเดิมของ ${custName} เรียบร้อยแล้ว`);
     }
 
-    function renderHistoryList() {
+    // เรนเดอร์ประวัติพร้อมสรุปยอดตามช่วงเวลาที่เลือก
+    function renderHistoryAndSummary() {
+      const startDate = document.getElementById("filterStartDate").value;
+      const endDate = document.getElementById("filterEndDate").value;
       const search = document.getElementById("historySearchInput").value.trim().toLowerCase();
+
+      // กรองประวัติ
+      const filtered = ordersHistory.filter(o => {
+        const oDate = o.orderDate || o.updatedAt.split('T')[0];
+        const inDateRange = (!startDate || oDate >= startDate) && (!endDate || oDate <= endDate);
+        const inSearch = o.customerName.toLowerCase().includes(search) || o.orderId.toLowerCase().includes(search);
+        return inDateRange && inSearch;
+      });
+
+      // 1. คำนวณสรุปยอดเงินรวม
+      let totalRev = 0;
+      let summaryMatrix = {}; // { "ล.สั้น": 120 }
+
+      filtered.forEach(o => {
+        totalRev += (o.totalAmount || 0);
+        o.items.forEach(item => {
+          // แปลงชื่อสินค้าถ้าอยู่ในกลุ่มตัวย่อเดียวกัน
+          const targetName = ITEM_GROUP_ALIAS[item.name] || item.name;
+          summaryMatrix[targetName] = (summaryMatrix[targetName] || 0) + item.qty;
+        });
+      });
+
+      document.getElementById("summaryTotalRevenue").textContent = totalRev.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " ฿";
+      document.getElementById("summaryOrderCount").textContent = filtered.length + " ออเดอร์";
+
+      // 2. เรนเดอร์ Matrix สินค้ารวม
+      const matrixContainer = document.getElementById("summaryProductsMatrix");
+      matrixContainer.innerHTML = "";
+      const matrixKeys = Object.keys(summaryMatrix);
+
+      if (matrixKeys.length === 0) {
+        matrixContainer.innerHTML = `<div class="py-3 text-center text-gray-400">ไม่มีข้อมูลรายการสินค้าในช่วงเวลานี้</div>`;
+      } else {
+        matrixKeys.forEach(pName => {
+          const row = document.createElement("div");
+          row.className = "py-2 flex justify-between items-center";
+          row.innerHTML = `
+            <span class="font-medium text-gray-700">${pName}</span>
+            <span class="font-bold bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full">${summaryMatrix[pName].toLocaleString()} หน่วย</span>
+          `;
+          matrixContainer.appendChild(row);
+        });
+      }
+
+      // 3. เรนเดอร์รายการออเดอร์ ( Accordion )
       const container = document.getElementById("historyListContainer");
       container.innerHTML = "";
 
-      const filtered = ordersHistory.filter(o => 
-        o.customerName.toLowerCase().includes(search) || o.orderId.toLowerCase().includes(search)
-      );
-
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">ไม่พบประวัติออเดอร์</div>`;
+        container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">ไม่พบประวัติออเดอร์ตามช่วงเวลานี้</div>`;
         return;
       }
 
       filtered.forEach(o => {
         const card = document.createElement("div");
-        card.className = "bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-2";
-        const dateStr = new Date(o.updatedAt).toLocaleString("th-TH");
-        
-        card.innerHTML = `
-          <div class="flex justify-between items-start">
-            <div>
-              <div class="font-bold text-gray-800">${o.customerName}</div>
-              <div class="text-xs text-gray-400">${o.orderId} • ${dateStr}</div>
-            </div>
-            <span class="px-2 py-1 text-xs font-bold rounded-full ${o.syncStatus === 'SUCCESS' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
-              ${o.syncStatus === 'SUCCESS' ? 'ซิงก์แล้ว' : 'ค้างซิงก์'}
-            </span>
+        card.className = "bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden";
+        const dateStr = o.orderDate || o.updatedAt.split('T')[0];
+
+        let itemsHtml = o.items.map(i => `
+          <div class="flex justify-between text-xs py-1 border-b border-gray-50 last:border-0">
+            <span class="text-gray-700">${i.name} x ${i.qty}</span>
+            <span class="font-semibold text-gray-800">${(i.qty * i.price).toLocaleString()} ฿</span>
           </div>
-          <div class="text-xs text-gray-600">${o.items.length} รายการ • ยอดรวม <span class="font-bold text-blue-600">${o.totalAmount.toLocaleString()} บาท</span></div>
-          <div class="flex justify-end gap-2 pt-2 border-t">
-            <button onclick="editHistoryOrder('${o.orderId}')" class="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium text-xs rounded-lg flex items-center gap-1">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> แก้ไขออเดอร์นี้
-            </button>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="p-4 space-y-2">
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-bold text-gray-800">${o.customerName}</div>
+                <div class="text-xs text-gray-400">วันที่คีย์: ${dateStr} • ${o.orderId}</div>
+              </div>
+              <span class="px-2 py-1 text-xs font-bold rounded-full ${o.syncStatus === 'SUCCESS' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                ${o.syncStatus === 'SUCCESS' ? 'ซิงก์แล้ว' : 'ค้างซิงก์'}
+              </span>
+            </div>
+
+            <div class="flex justify-between items-center pt-1">
+              <span class="text-xs text-gray-600">${o.items.length} รายการ • <span class="font-bold text-blue-600">${o.totalAmount.toLocaleString()} บาท</span></span>
+              <button onclick="toggleAccordion('${o.orderId}')" class="text-xs text-blue-600 font-medium flex items-center gap-0.5">
+                ดูรายการสินค้า <i id="icon_${o.orderId}" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+              </button>
+            </div>
+
+            <!-- Accordion Details -->
+            <div id="details_${o.orderId}" class="hidden bg-gray-50 p-3 rounded-lg mt-2 border border-gray-100 space-y-1">
+              ${itemsHtml}
+              <div class="pt-2 flex justify-end">
+                <button onclick="editHistoryOrder('${o.orderId}')" class="px-3 py-1 bg-blue-600 text-white font-medium text-xs rounded-lg flex items-center gap-1">
+                  <i data-lucide="edit-3" class="w-3 h-3"></i> แก้ไขออเดอร์นี้
+                </button>
+              </div>
+            </div>
           </div>
         `;
         container.appendChild(card);
       });
       lucide.createIcons();
+    }
+
+    function toggleAccordion(orderId) {
+      const details = document.getElementById(`details_${orderId}`);
+      const icon = document.getElementById(`icon_${orderId}`);
+      if (details.classList.contains("hidden")) {
+        details.classList.remove("hidden");
+        icon.style.transform = "rotate(180deg)";
+      } else {
+        details.classList.add("hidden");
+        icon.style.transform = "rotate(0deg)";
+      }
     }
 
     function editHistoryOrder(orderId) {
@@ -487,6 +659,7 @@
 
       currentOrderId = order.orderId;
       document.getElementById("customerSelect").value = order.customerName;
+      document.getElementById("orderDateInput").value = order.orderDate || order.updatedAt.split('T')[0];
       onCustomerChange();
 
       cart = {};
@@ -499,31 +672,76 @@
       renderCart();
     }
 
+    // เรนเดอร์การจัดการสินค้า (สลับลำดับ / ซ่อนแสดง / แก้ราคา)
     function renderGlobalPriceList() {
       const container = document.getElementById("globalPriceListContainer");
       container.innerHTML = "";
 
-      products.forEach(p => {
+      products.forEach((p, idx) => {
         const row = document.createElement("div");
-        row.className = "flex items-center justify-between p-3 bg-gray-50 rounded-lg border";
+        row.className = "flex items-center justify-between p-3 bg-gray-50 rounded-lg border gap-2 text-xs";
+        const isVisible = p.visible !== false;
+
         row.innerHTML = `
-          <span class="font-bold text-gray-800 text-sm">${p.name}</span>
+          <div class="flex items-center gap-1.5 flex-1">
+            <div class="flex flex-col">
+              <button onclick="moveProduct(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-0.5 text-gray-500 disabled:opacity-20"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
+              <button onclick="moveProduct(${idx}, 1)" ${idx === products.length - 1 ? 'disabled' : ''} class="p-0.5 text-gray-500 disabled:opacity-20"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <span class="font-bold text-gray-800 text-sm ${!isVisible ? 'line-through text-gray-400' : ''}">${p.name}</span>
+          </div>
+
           <div class="flex items-center gap-2">
-            <input type="number" step="0.5" id="globalPrice_${p.name}" value="${p.price}" class="w-20 p-2 border rounded font-bold text-right text-sm">
-            <button onclick="saveGlobalPrice('${p.name}')" class="px-3 py-2 bg-blue-600 text-white font-medium text-xs rounded-lg hover:bg-blue-700">บันทึกถาวร</button>
+            <button onclick="toggleProductVisibility(${idx})" class="px-2 py-1 text-xs rounded font-medium ${isVisible ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}">
+              ${isVisible ? 'แสดง' : 'ซ่อน'}
+            </button>
+            <input type="number" step="0.5" id="globalPrice_${idx}" value="${p.price}" class="w-16 p-1.5 border rounded font-bold text-right text-xs">
+            <button onclick="saveGlobalPrice(${idx})" class="px-2.5 py-1.5 bg-blue-600 text-white font-medium text-xs rounded-lg">บันทึก</button>
           </div>
         `;
         container.appendChild(row);
       });
+      lucide.createIcons();
     }
 
-    async function saveGlobalPrice(itemName) {
-      const input = document.getElementById(`globalPrice_${itemName}`);
-      const newPrice = parseFloat(input.value) || 0;
+    function moveProduct(idx, direction) {
+      const newIdx = idx + direction;
+      if (newIdx < 0 || newIdx >= products.length) return;
+      const temp = products[idx];
+      products[idx] = products[newIdx];
+      products[newIdx] = temp;
+      saveStoredProducts();
+      renderGlobalPriceList();
+      renderProductCards();
+    }
 
-      const prod = products.find(p => p.name === itemName);
-      if (prod) prod.price = newPrice;
-      localStorage.setItem("PRODUCTS_DB", JSON.stringify(products));
+    function toggleProductVisibility(idx) {
+      products[idx].visible = products[idx].visible === false ? true : false;
+      saveStoredProducts();
+      renderGlobalPriceList();
+      renderProductCards();
+    }
+
+    function addNewProductPrompt() {
+      const name = prompt("กรอกชื่อสินค้าใหม่:");
+      if (!name) return;
+      const priceStr = prompt("กรอกราคากลางตั้งต้น (บาท):", "30");
+      const price = parseFloat(priceStr) || 0;
+
+      products.push({ name: name.trim(), price: price, visible: true });
+      saveStoredProducts();
+      renderGlobalPriceList();
+      renderProductCards();
+      alert(`เพิ่มสินค้า "${name}" เรียบร้อยแล้ว`);
+    }
+
+    async function saveGlobalPrice(idx) {
+      const input = document.getElementById(`globalPrice_${idx}`);
+      const newPrice = parseFloat(input.value) || 0;
+      const itemName = products[idx].name;
+
+      products[idx].price = newPrice;
+      saveStoredProducts();
 
       if (gasUrl) {
         try {
@@ -547,20 +765,21 @@
       document.getElementById("tabHistory").classList.add("hidden");
       document.getElementById("tabPrice").classList.add("hidden");
 
-      document.getElementById("tabNavKey").className = "py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1";
-      document.getElementById("tabNavHistory").className = "py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1";
-      document.getElementById("tabNavPrice").className = "py-3 px-4 text-gray-500 border-b-2 border-transparent flex items-center gap-1";
+      document.getElementById("tabNavKey").className = "py-3 px-3 text-gray-500 border-b-2 border-transparent flex items-center gap-1 whitespace-nowrap";
+      document.getElementById("tabNavHistory").className = "py-3 px-3 text-gray-500 border-b-2 border-transparent flex items-center gap-1 whitespace-nowrap";
+      document.getElementById("tabNavPrice").className = "py-3 px-3 text-gray-500 border-b-2 border-transparent flex items-center gap-1 whitespace-nowrap";
 
       if (tab === 'key') {
         document.getElementById("tabKey").classList.remove("hidden");
-        document.getElementById("tabNavKey").className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1";
+        document.getElementById("tabNavKey").className = "py-3 px-3 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1 whitespace-nowrap";
       } else if (tab === 'history') {
         document.getElementById("tabHistory").classList.remove("hidden");
-        document.getElementById("tabNavHistory").className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1";
-        renderHistoryList();
+        document.getElementById("tabNavHistory").className = "py-3 px-3 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1 whitespace-nowrap";
+        renderHistoryAndSummary();
       } else if (tab === 'price') {
         document.getElementById("tabPrice").classList.remove("hidden");
-        document.getElementById("tabNavPrice").className = "py-3 px-4 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1";
+        document.getElementById("tabNavPrice").className = "py-3 px-3 text-blue-600 border-b-2 border-blue-600 flex items-center gap-1 whitespace-nowrap";
+        renderGlobalPriceList();
       }
     }
 
