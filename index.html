@@ -42,7 +42,6 @@
 
   <!-- TAB 1: คีย์ออเดอร์ -->
   <main id="tabKey" class="p-4 space-y-4">
-    <!-- เลือกวันที่และเลือกลูกค้า -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
       <div>
         <label class="block text-xs font-semibold text-gray-500 mb-1">วันที่ระบุในออเดอร์</label>
@@ -62,7 +61,6 @@
       </button>
     </div>
 
-    <!-- ค้นหารายการสินค้า -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
       <label class="block text-xs font-semibold text-gray-500 mb-1">ค้นหารายการสินค้า</label>
       <div class="relative">
@@ -71,10 +69,8 @@
       </div>
     </div>
 
-    <!-- สินค้า Cards -->
     <div id="productListContainer" class="space-y-3"></div>
 
-    <!-- ตารางสรุปออเดอร์ที่เลือก -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mt-6">
       <div class="flex justify-between items-center mb-3">
         <h3 class="font-bold text-gray-800 flex items-center gap-1">
@@ -98,7 +94,18 @@
 
   <!-- TAB 2: ประวัติ & สรุปยอด -->
   <main id="tabHistory" class="p-4 space-y-4 hidden">
-    <!-- กรองวันที่ -->
+    <!-- กล่องจัดการลูกค้าหยุดหลายคน -->
+    <div class="bg-red-50 p-4 rounded-xl shadow-sm border border-red-200 space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-red-800 text-sm flex items-center gap-1">
+          <i data-lucide="user-x" class="w-4 h-4 text-red-600"></i> เลือกติ๊กลูกค้าที่หยุด (ล้างหลายคน)
+        </h3>
+        <button onclick="toggleBatchModal()" class="px-3 py-1 bg-red-600 text-white font-bold text-xs rounded-lg flex items-center gap-1 shadow-sm hover:bg-red-700">
+          เปิดตารางเลือกชื่อลูกค้า
+        </button>
+      </div>
+    </div>
+
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
       <div class="flex justify-between items-center">
         <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1">
@@ -121,7 +128,6 @@
       <input type="text" id="historySearchInput" oninput="renderHistoryAndSummary()" placeholder="ค้นหาตามชื่อลูกค้า หรือ Order ID..." class="w-full p-2.5 bg-gray-50 border rounded-lg text-xs">
     </div>
 
-    <!-- การ์ดสรุปยอดเงินรวม -->
     <div class="grid grid-cols-2 gap-3">
       <div class="bg-blue-600 text-white p-4 rounded-xl shadow-sm">
         <div class="text-xs text-blue-100 font-medium">ยอดขายรวมสุทธิ (ล่าสุด)</div>
@@ -133,19 +139,15 @@
       </div>
     </div>
 
-    <!-- สรุปจำนวนสินค้ารวม (คำนวณเฉพาะออเดอร์ล่าสุดของลูกค้าแต่ละราย) -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
       <h4 class="font-bold text-gray-800 text-sm mb-1 flex items-center justify-between">
         <span class="flex items-center gap-1"><i data-lucide="package-check" class="w-4 h-4 text-green-600"></i> สรุปจำนวนสินค้ารวมที่ต้องส่ง</span>
         <span class="text-xs text-blue-600 font-semibold">(ยึดออเดอร์ล่าสุด)</span>
       </h4>
       <p class="text-[11px] text-gray-400 mb-2">* รวมกลุ่มชื่อสินค้าตัวย่อเดียวกัน และนับเฉพาะออเดอร์ล่าสุดของลูกค้ารายนั้นๆ</p>
-      <div id="summaryProductsMatrix" class="divide-y divide-gray-100 text-xs">
-        <!-- JS จะมาเติมข้อมูล -->
-      </div>
+      <div id="summaryProductsMatrix" class="divide-y divide-gray-100 text-xs"></div>
     </div>
 
-    <!-- รายการออเดอร์ย่อย (ประวัติ) -->
     <div class="space-y-2">
       <h4 class="font-bold text-gray-800 text-sm">ประวัติออเดอร์ทั้งหมด</h4>
       <div id="historyListContainer" class="space-y-3"></div>
@@ -175,6 +177,37 @@
     <button onclick="syncOrderToGoogleSheets()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex justify-center items-center gap-1">
       <i data-lucide="send" class="w-5 h-5"></i> ส่ง Google Sheets
     </button>
+  </div>
+
+  <!-- Modal สำหรับติ๊กเลือกลูกค้าหยุดหลายคน -->
+  <div id="batchDeleteModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white w-full max-w-lg max-h-[85vh] p-5 rounded-2xl shadow-xl flex flex-col space-y-3">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="text-base font-bold text-red-700 flex items-center gap-1">
+          <i data-lucide="user-x" class="w-5 h-5"></i> ตารางเลือกลูกค้าหยุด (ล้างหลายคน)
+        </h3>
+        <button onclick="toggleBatchModal()" class="text-gray-400 hover:text-gray-600 font-bold p-1">✕</button>
+      </div>
+
+      <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg text-xs">
+        <label class="flex items-center gap-2 font-semibold text-gray-700 cursor-pointer">
+          <input type="checkbox" id="selectAllCustCheckbox" onchange="toggleSelectAllCustomers(this.checked)" class="w-4 h-4 text-red-600 rounded">
+          เลือกทั้งหมด / ไม่เลือก
+        </label>
+        <span class="text-gray-500">เลือกแล้ว <span id="selectedCustCount" class="font-bold text-red-600">0</span> คน</span>
+      </div>
+
+      <div id="customerCheckboxList" class="flex-1 overflow-y-auto divide-y divide-gray-100 border rounded-lg p-2 text-sm">
+        <!-- JS จะสร้าง Checkbox ลูกค้าให้ที่นี่ -->
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2 border-t">
+        <button onclick="toggleBatchModal()" class="px-4 py-2 bg-gray-100 text-gray-700 font-medium text-xs rounded-xl">ยกเลิก</button>
+        <button onclick="executeBatchDelete()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow">
+          ล้างออเดอร์ที่เลือกใน Google Sheets
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal ตั้งค่า -->
@@ -227,7 +260,6 @@
       { name: "เจ้กบ", sheet: "เจ้กบ", side: "LEFT" }
     ];
 
-    // แมปชื่อสินค้าที่ถือเป็นชนิดเดียวกัน
     const ITEM_GROUP_ALIAS = {
       "ล.บัว": "ล.สั้น",
       "สดแชมป์": "สด.ช",
@@ -285,6 +317,7 @@
       renderCart();
       renderGlobalPriceList();
       renderHistoryAndSummary();
+      renderCustomerCheckboxList();
       document.getElementById("gasUrlInput").value = gasUrl;
     });
 
@@ -312,9 +345,7 @@
 
     function loadStoredProducts() {
       const stored = localStorage.getItem("PRODUCTS_DB_V2");
-      if (stored) {
-        products = JSON.parse(stored);
-      }
+      if (stored) products = JSON.parse(stored);
     }
 
     function saveStoredProducts() {
@@ -523,6 +554,111 @@
       renderHistoryAndSummary();
     }
 
+    function toggleBatchModal() {
+      document.getElementById("batchDeleteModal").classList.toggle("hidden");
+    }
+
+    function renderCustomerCheckboxList() {
+      const container = document.getElementById("customerCheckboxList");
+      container.innerHTML = "";
+
+      CUSTOMERS.forEach(c => {
+        const row = document.createElement("label");
+        row.className = "flex items-center justify-between p-2 hover:bg-gray-50 cursor-pointer";
+        row.innerHTML = `
+          <span class="font-medium text-gray-800">${c.name}</span>
+          <input type="checkbox" value="${c.name}" class="cust-batch-checkbox w-4 h-4 text-red-600 rounded" onchange="updateSelectedCustCount()">
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function toggleSelectAllCustomers(checked) {
+      const checkboxes = document.querySelectorAll('.cust-batch-checkbox');
+      checkboxes.forEach(cb => cb.checked = checked);
+      updateSelectedCustCount();
+    }
+
+    function updateSelectedCustCount() {
+      const selected = document.querySelectorAll('.cust-batch-checkbox:checked');
+      document.getElementById("selectedCustCount").textContent = selected.length;
+    }
+
+    async function executeBatchDelete() {
+      const checkedBoxes = document.querySelectorAll('.cust-batch-checkbox:checked');
+      if (checkedBoxes.length === 0) {
+        alert("กรุณาเลือกชื่อลูกค้าที่ต้องการล้างอย่างน้อย 1 คน");
+        return;
+      }
+
+      const selectedNames = Array.from(checkedBoxes).map(cb => cb.value);
+      const targetCusts = CUSTOMERS.filter(c => selectedNames.includes(c.name));
+
+      if (!confirm(`ยืนยันล้างออเดอร์ใน Google Sheets สำหรับลูกค้าทั้ง ${selectedNames.length} คน ?\n\nรายชื่อ: ${selectedNames.join(', ')}`)) {
+        return;
+      }
+
+      // ลบประวัติของลูกค้ากลุ่มนี้ในโทรศัพท์ด้วย
+      ordersHistory = ordersHistory.filter(o => !selectedNames.includes(o.customerName));
+      localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
+      renderHistoryAndSummary();
+
+      if (gasUrl) {
+        const badge = document.getElementById("syncStatusBadge");
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-yellow-400 inline-block animate-ping"></span> กำลังลบออเดอร์ ${selectedNames.length} ราย...`;
+
+        try {
+          const resp = await fetch(gasUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({
+              action: "batchDeleteOrders",
+              customersList: targetCusts
+            })
+          });
+          const res = await resp.json();
+
+          if (res.status === "success") {
+            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> ลบออเดอร์สำเร็จ`;
+            alert(`ล้างตารางใน Google Sheets สำหรับลูกค้าทั้ง ${res.data.clearedCount} คนเรียบร้อยแล้ว!`);
+            toggleBatchModal();
+          } else {
+            throw new Error(res.message);
+          }
+        } catch (err) {
+          badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span> ลบไม่สำเร็จ`;
+          alert("เกิดข้อผิดพลาดในการลบใน Google Sheets: " + err.message);
+        }
+      } else {
+        alert("ลบประวัติบนมือถือเรียบร้อยแล้ว (ยังไม่ได้ตั้งค่า Web App URL)");
+        toggleBatchModal();
+      }
+    }
+
+    async function deleteSingleOrder(orderId) {
+      const order = ordersHistory.find(o => o.orderId === orderId);
+      if (!order) return;
+
+      if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบออเดอร์ของ "${order.customerName}" ?`)) return;
+
+      ordersHistory = ordersHistory.filter(o => o.orderId !== orderId);
+      localStorage.setItem("ORDERS_HISTORY", JSON.stringify(ordersHistory));
+      renderHistoryAndSummary();
+
+      if (gasUrl) {
+        try {
+          await fetch(gasUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({ action: "deleteOrder", orderId: orderId, sheetName: order.sheetName, side: order.side })
+          });
+          alert(`ลบออเดอร์และล้างตารางใน Google Sheets ของ "${order.customerName}" เรียบร้อยแล้ว`);
+        } catch (err) {
+          alert("ลบในเครื่องแล้ว แต่ลบใน Google Sheets ไม่สำเร็จ: " + err.message);
+        }
+      }
+    }
+
     function loadPreviousTemplate() {
       const custName = document.getElementById("customerSelect").value;
       if (!custName) { alert("กรุณาเลือกลูกค้าก่อน"); return; }
@@ -540,13 +676,9 @@
       alert(`ดึงรายการแม่แบบเดิมของ ${custName} เรียบร้อยแล้ว`);
     }
 
-    // ล้างประวัติทั้งหมดบนอุปกรณ์
     function clearAllHistoryPrompt() {
-      if (ordersHistory.length === 0) {
-        alert("ไม่มีประวัติออเดอร์ให้ล้าง");
-        return;
-      }
-      if (confirm("คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติออเดอร์ทั้งหมดบนโทรศัพท์เครื่องนี้? (ข้อมูลที่ส่งลง Google Sheets ไปแล้วจะไม่ถูกลบ)")) {
+      if (ordersHistory.length === 0) { alert("ไม่มีประวัติออเดอร์ให้ล้าง"); return; }
+      if (confirm("คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติออเดอร์ทั้งหมดบนโทรศัพท์เครื่องนี้?")) {
         ordersHistory = [];
         localStorage.removeItem("ORDERS_HISTORY");
         renderHistoryAndSummary();
@@ -554,13 +686,11 @@
       }
     }
 
-    // เรนเดอร์ประวัติและคำนวณสรุปยอด (ยึดเฉพาะออเดอร์ล่าสุดของลูกค้าแต่ละรายในวันเดียวกัน)
     function renderHistoryAndSummary() {
       const startDate = document.getElementById("filterStartDate").value;
       const endDate = document.getElementById("filterEndDate").value;
       const search = document.getElementById("historySearchInput").value.trim().toLowerCase();
 
-      // 1. กรองประวัติทั้งหมดตามช่วงวันที่และคำค้นหา (สำหรับแสดงในรายการประวัติย่อย)
       const filtered = ordersHistory.filter(o => {
         const oDate = o.orderDate || o.updatedAt.split('T')[0];
         const inDateRange = (!startDate || oDate >= startDate) && (!endDate || oDate <= endDate);
@@ -568,16 +698,10 @@
         return inDateRange && inSearch;
       });
 
-      // 2. จัดกลุ่มคัดเฉพาะ "ออเดอร์ล่าสุด" ของลูกค้าแต่ละรายในแต่ละวัน เพื่อใช้นำมาคำนวณสรุปยอด
-      // Map key: "CustomerName_OrderDate" -> Order Obj
       let latestOrdersMap = {};
-
       filtered.forEach(o => {
         const oDate = o.orderDate || o.updatedAt.split('T')[0];
         const groupKey = `${o.customerName}_${oDate}`;
-
-        // เนื่องจาก ordersHistory เรียงลำดับจากล่าสุดขึ้นก่อนเสมอ 
-        // รายการแรกที่พบในแต่ละ groupKey จึงเป็นออเดอร์อันล่าสุดเสมอ
         if (!latestOrdersMap[groupKey]) {
           latestOrdersMap[groupKey] = o;
         }
@@ -585,7 +709,6 @@
 
       const latestOrdersList = Object.values(latestOrdersMap);
 
-      // 3. คำนวณสรุปยอดเงินรวม และจำนวนสินค้ารวมจาก latestOrdersList
       let totalRev = 0;
       let summaryMatrix = {};
 
@@ -600,7 +723,6 @@
       document.getElementById("summaryTotalRevenue").textContent = totalRev.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " ฿";
       document.getElementById("summaryOrderCount").textContent = latestOrdersList.length + " ราย";
 
-      // 4. เรนเดอร์ Matrix สินค้ารวม
       const matrixContainer = document.getElementById("summaryProductsMatrix");
       matrixContainer.innerHTML = "";
       const matrixKeys = Object.keys(summaryMatrix);
@@ -619,7 +741,6 @@
         });
       }
 
-      // 5. เรนเดอร์รายการประวัติออเดอร์ย่อยทั้งหมด
       const container = document.getElementById("historyListContainer");
       container.innerHTML = "";
 
@@ -659,11 +780,14 @@
               </button>
             </div>
 
-            <div id="details_${o.orderId}" class="hidden bg-gray-50 p-3 rounded-lg mt-2 border border-gray-100 space-y-1">
+            <div id="details_${o.orderId}" class="hidden bg-gray-50 p-3 rounded-lg mt-2 border border-gray-100 space-y-2">
               ${itemsHtml}
-              <div class="pt-2 flex justify-end">
-                <button onclick="editHistoryOrder('${o.orderId}')" class="px-3 py-1 bg-blue-600 text-white font-medium text-xs rounded-lg flex items-center gap-1">
-                  <i data-lucide="edit-3" class="w-3 h-3"></i> แก้ไขออเดอร์นี้
+              <div class="pt-2 flex justify-between items-center border-t border-gray-200 mt-2">
+                <button onclick="deleteSingleOrder('${o.orderId}')" class="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 font-medium text-xs rounded-lg flex items-center gap-1">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ลบออเดอร์นี้ (ลูกค้าหยุด)
+                </button>
+                <button onclick="editHistoryOrder('${o.orderId}')" class="px-3 py-1.5 bg-blue-600 text-white font-medium text-xs rounded-lg flex items-center gap-1">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> แก้ไขออเดอร์นี้
                 </button>
               </div>
             </div>
