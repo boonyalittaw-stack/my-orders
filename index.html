@@ -100,9 +100,14 @@
   <main id="tabHistory" class="p-4 space-y-4 hidden">
     <!-- กรองวันที่ -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
-      <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1">
-        <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i> เลือกช่วงเวลาที่ต้องการดูสรุป
-      </h3>
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1">
+          <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i> เลือกช่วงเวลาที่ต้องการดูสรุป
+        </h3>
+        <button onclick="clearAllHistoryPrompt()" class="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ล้างประวัติทั้งหมด
+        </button>
+      </div>
       <div class="grid grid-cols-2 gap-2">
         <div>
           <label class="block text-xs text-gray-500 mb-1">ตั้งแต่วันที่</label>
@@ -119,21 +124,22 @@
     <!-- การ์ดสรุปยอดเงินรวม -->
     <div class="grid grid-cols-2 gap-3">
       <div class="bg-blue-600 text-white p-4 rounded-xl shadow-sm">
-        <div class="text-xs text-blue-100 font-medium">ยอดขายรวมสุทธิ</div>
+        <div class="text-xs text-blue-100 font-medium">ยอดขายรวมสุทธิ (ล่าสุด)</div>
         <div id="summaryTotalRevenue" class="text-xl font-bold mt-1">0.00 ฿</div>
       </div>
       <div class="bg-indigo-600 text-white p-4 rounded-xl shadow-sm">
-        <div class="text-xs text-indigo-100 font-medium">จำนวนออเดอร์ทั้งหมด</div>
-        <div id="summaryOrderCount" class="text-xl font-bold mt-1">0 ออเดอร์</div>
+        <div class="text-xs text-indigo-100 font-medium">จำนวนลูกค้าที่สั่ง</div>
+        <div id="summaryOrderCount" class="text-xl font-bold mt-1">0 ราย</div>
       </div>
     </div>
 
-    <!-- สรุปจำนวนสินค้ารวม (ตามแมปกลุ่มสินค้า) -->
+    <!-- สรุปจำนวนสินค้ารวม (คำนวณเฉพาะออเดอร์ล่าสุดของลูกค้าแต่ละราย) -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-      <h4 class="font-bold text-gray-800 text-sm mb-2 flex items-center justify-between">
+      <h4 class="font-bold text-gray-800 text-sm mb-1 flex items-center justify-between">
         <span class="flex items-center gap-1"><i data-lucide="package-check" class="w-4 h-4 text-green-600"></i> สรุปจำนวนสินค้ารวมที่ต้องส่ง</span>
-        <span class="text-xs text-gray-400 font-normal">(รวมกลุ่มชื่อตัวย่อแล้ว)</span>
+        <span class="text-xs text-blue-600 font-semibold">(ยึดออเดอร์ล่าสุด)</span>
       </h4>
+      <p class="text-[11px] text-gray-400 mb-2">* รวมกลุ่มชื่อสินค้าตัวย่อเดียวกัน และนับเฉพาะออเดอร์ล่าสุดของลูกค้ารายนั้นๆ</p>
       <div id="summaryProductsMatrix" class="divide-y divide-gray-100 text-xs">
         <!-- JS จะมาเติมข้อมูล -->
       </div>
@@ -141,7 +147,7 @@
 
     <!-- รายการออเดอร์ย่อย (ประวัติ) -->
     <div class="space-y-2">
-      <h4 class="font-bold text-gray-800 text-sm">รายการประวัติออเดอร์</h4>
+      <h4 class="font-bold text-gray-800 text-sm">ประวัติออเดอร์ทั้งหมด</h4>
       <div id="historyListContainer" class="space-y-3"></div>
     </div>
   </main>
@@ -266,7 +272,6 @@
     let gasUrl = localStorage.getItem("GAS_WEB_APP_URL") || "";
 
     window.addEventListener("DOMContentLoaded", () => {
-      // ตั้งค่าวันที่เริ่มต้นเป็นวันปัจจุบัน
       const today = new Date().toISOString().split('T')[0];
       document.getElementById("orderDateInput").value = today;
       document.getElementById("filterStartDate").value = today;
@@ -326,7 +331,6 @@
       const container = document.getElementById("productListContainer");
       container.innerHTML = "";
 
-      // กรองเฉพาะรายการที่ visible = true (หรือไม่ได้ถูกซ่อนไว้)
       const visibleProducts = products.filter(p => p.visible !== false);
       const filtered = visibleProducts.filter(p => p.name.toLowerCase().includes(search));
 
@@ -536,13 +540,27 @@
       alert(`ดึงรายการแม่แบบเดิมของ ${custName} เรียบร้อยแล้ว`);
     }
 
-    // เรนเดอร์ประวัติพร้อมสรุปยอดตามช่วงเวลาที่เลือก
+    // ล้างประวัติทั้งหมดบนอุปกรณ์
+    function clearAllHistoryPrompt() {
+      if (ordersHistory.length === 0) {
+        alert("ไม่มีประวัติออเดอร์ให้ล้าง");
+        return;
+      }
+      if (confirm("คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติออเดอร์ทั้งหมดบนโทรศัพท์เครื่องนี้? (ข้อมูลที่ส่งลง Google Sheets ไปแล้วจะไม่ถูกลบ)")) {
+        ordersHistory = [];
+        localStorage.removeItem("ORDERS_HISTORY");
+        renderHistoryAndSummary();
+        alert("ล้างประวัติออเดอร์บนเครื่องเรียบร้อยแล้ว");
+      }
+    }
+
+    // เรนเดอร์ประวัติและคำนวณสรุปยอด (ยึดเฉพาะออเดอร์ล่าสุดของลูกค้าแต่ละรายในวันเดียวกัน)
     function renderHistoryAndSummary() {
       const startDate = document.getElementById("filterStartDate").value;
       const endDate = document.getElementById("filterEndDate").value;
       const search = document.getElementById("historySearchInput").value.trim().toLowerCase();
 
-      // กรองประวัติ
+      // 1. กรองประวัติทั้งหมดตามช่วงวันที่และคำค้นหา (สำหรับแสดงในรายการประวัติย่อย)
       const filtered = ordersHistory.filter(o => {
         const oDate = o.orderDate || o.updatedAt.split('T')[0];
         const inDateRange = (!startDate || oDate >= startDate) && (!endDate || oDate <= endDate);
@@ -550,23 +568,39 @@
         return inDateRange && inSearch;
       });
 
-      // 1. คำนวณสรุปยอดเงินรวม
-      let totalRev = 0;
-      let summaryMatrix = {}; // { "ล.สั้น": 120 }
+      // 2. จัดกลุ่มคัดเฉพาะ "ออเดอร์ล่าสุด" ของลูกค้าแต่ละรายในแต่ละวัน เพื่อใช้นำมาคำนวณสรุปยอด
+      // Map key: "CustomerName_OrderDate" -> Order Obj
+      let latestOrdersMap = {};
 
       filtered.forEach(o => {
+        const oDate = o.orderDate || o.updatedAt.split('T')[0];
+        const groupKey = `${o.customerName}_${oDate}`;
+
+        // เนื่องจาก ordersHistory เรียงลำดับจากล่าสุดขึ้นก่อนเสมอ 
+        // รายการแรกที่พบในแต่ละ groupKey จึงเป็นออเดอร์อันล่าสุดเสมอ
+        if (!latestOrdersMap[groupKey]) {
+          latestOrdersMap[groupKey] = o;
+        }
+      });
+
+      const latestOrdersList = Object.values(latestOrdersMap);
+
+      // 3. คำนวณสรุปยอดเงินรวม และจำนวนสินค้ารวมจาก latestOrdersList
+      let totalRev = 0;
+      let summaryMatrix = {};
+
+      latestOrdersList.forEach(o => {
         totalRev += (o.totalAmount || 0);
         o.items.forEach(item => {
-          // แปลงชื่อสินค้าถ้าอยู่ในกลุ่มตัวย่อเดียวกัน
           const targetName = ITEM_GROUP_ALIAS[item.name] || item.name;
           summaryMatrix[targetName] = (summaryMatrix[targetName] || 0) + item.qty;
         });
       });
 
       document.getElementById("summaryTotalRevenue").textContent = totalRev.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " ฿";
-      document.getElementById("summaryOrderCount").textContent = filtered.length + " ออเดอร์";
+      document.getElementById("summaryOrderCount").textContent = latestOrdersList.length + " ราย";
 
-      // 2. เรนเดอร์ Matrix สินค้ารวม
+      // 4. เรนเดอร์ Matrix สินค้ารวม
       const matrixContainer = document.getElementById("summaryProductsMatrix");
       matrixContainer.innerHTML = "";
       const matrixKeys = Object.keys(summaryMatrix);
@@ -585,7 +619,7 @@
         });
       }
 
-      // 3. เรนเดอร์รายการออเดอร์ ( Accordion )
+      // 5. เรนเดอร์รายการประวัติออเดอร์ย่อยทั้งหมด
       const container = document.getElementById("historyListContainer");
       container.innerHTML = "";
 
@@ -625,7 +659,6 @@
               </button>
             </div>
 
-            <!-- Accordion Details -->
             <div id="details_${o.orderId}" class="hidden bg-gray-50 p-3 rounded-lg mt-2 border border-gray-100 space-y-1">
               ${itemsHtml}
               <div class="pt-2 flex justify-end">
@@ -672,7 +705,6 @@
       renderCart();
     }
 
-    // เรนเดอร์การจัดการสินค้า (สลับลำดับ / ซ่อนแสดง / แก้ราคา)
     function renderGlobalPriceList() {
       const container = document.getElementById("globalPriceListContainer");
       container.innerHTML = "";
